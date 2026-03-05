@@ -205,3 +205,9 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# ── CleanTalk project ──────────────────────────────
+node_modules/
+frontend/dist/
+*.log
+
