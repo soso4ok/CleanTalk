@@ -89,16 +89,17 @@ Each service owns its own database, communicates over HTTP, and can be deployed,
 | Language | Python 3.12 |
 | Backend framework | FastAPI 0.111 |
 | Database | PostgreSQL 16 (per service) |
-| ORM | SQLAlchemy 2 + Alembic |
-| Authentication | JWT (python-jose) |
-| Password hashing | bcrypt (passlib) |
-| AI moderation | Hugging Face `transformers` / OpenAI API |
+| ORM | SQLAlchemy 2 + Alembic | - under question
+| Authentication | JWT (python-jose) | - under question
+| Password hashing | bcrypt (passlib) | - under question
+| AI moderation | Hugging Face `transformers` / Gemini API |
 | Frontend framework | React 18 |
 | Frontend build tool | Vite 5 |
 | CSS framework | Tailwind CSS 3 |
 | Containerisation | Docker + Docker Compose |
-| HTTP client (FE) | Axios |
+| HTTP client (FE) | Axios | - under question
 | State management | React Query (TanStack Query v5) |
+| Cloud | AWS |
 
 ---
 
@@ -192,8 +193,7 @@ CleanTalk/
 
 | Tool | Minimum version |
 |------|----------------|
-| Docker | 24 |
-| Docker Compose | v2 (plugin) |
+| Docker and Docker Compose |
 | Node.js *(local dev only)* | 20 LTS |
 | Python *(local dev only)* | 3.12 |
 
@@ -207,7 +207,7 @@ cd CleanTalk
 # 2. Copy and edit environment variables
 cp .env.example .env
 # → Open .env and set your SECRET_KEY, database passwords,
-#   and (optionally) OPENAI_API_KEY or HF_MODEL_NAME
+#   and (optionally) GEMINI API or HF_MODEL_NAME
 
 # 3. Start all services
 docker compose up --build
@@ -328,7 +328,7 @@ The AI moderation pipeline lives in `comment-service/app/moderation.py`.
 
 | `AI_BACKEND` value | Description |
 |--------------------|-------------|
-| `openai` | Uses OpenAI Chat Completions API (requires `OPENAI_API_KEY`) |
+| `geminiapi` | Uses Gemini Chat Completions API (requires `GEMINI_API_KEY`) |
 | `huggingface` | Uses a local Hugging Face `text-classification` model (set `HF_MODEL_NAME`) |
 | `mock` | Deterministic mock – returns `ok` for everything. Useful for tests. |
 
