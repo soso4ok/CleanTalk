@@ -1,8 +1,5 @@
-"""AI moderation module.
-
-Supports three backends configured via AI_BACKEND env var:
   - mock: always returns 'ok' (for testing)
-  - openai: uses OpenAI Chat Completions API
+  - gemini: uses Google Gemini API
   - huggingface: uses a local Hugging Face text-classification model
 """
 
@@ -11,6 +8,8 @@ from __future__ import annotations
 import logging
 
 from app.config import settings
+
+import google.generativeai as genai
 
 logger = logging.getLogger(__name__)
 
@@ -26,8 +25,8 @@ async def moderate_comment(text: str) -> str:
 
     if backend == "mock":
         return _moderate_mock(text)
-    elif backend == "openai":
-        return await _moderate_openai(text)
+    elif backend == "gemini" or backend == "geminiapi":
+        return await _moderate_gemini(text)
     elif backend == "huggingface":
         return _moderate_huggingface(text)
     else:
@@ -40,15 +39,17 @@ def _moderate_mock(text: str) -> str:
     return "ok"
 
 
-async def _moderate_openai(text: str) -> str:
-    """Use OpenAI Chat Completions API for moderation."""
-    from openai import AsyncOpenAI
+    return verdict
 
-    if not settings.OPENAI_API_KEY:
-        logger.error("OPENAI_API_KEY not set, falling back to mock")
+
+async def _moderate_gemini(text: str) -> str:
+    """Use Google Gemini API for moderation."""
+    if not settings.GEMINI_API_KEY:
+        logger.error("GEMINI_API_KEY not set, falling back to mock")
         return "ok"
 
-    client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+    genai.configure(api_key=settings.GEMINI_API_KEY)
+    model = genai.GenerativeModel("gemini-1.5-flash")
 
     prompt = (
         "You are a content moderator for a public blog.\n"
@@ -57,18 +58,22 @@ async def _moderate_openai(text: str) -> str:
         f'Comment: "{text}"'
     )
 
-    response = await client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=[{"role": "user", "content": prompt}],
-        max_tokens=10,
-        temperature=0,
-    )
-
-    verdict = response.choices[0].message.content.strip().lower()
-    if verdict not in VALID_VERDICTS:
-        logger.warning("OpenAI returned unexpected verdict '%s', defaulting to 'hide'", verdict)
+    try:
+        response = await model.generate_content_async(
+            prompt,
+            generation_config=genai.types.GenerationConfig(
+                max_output_tokens=10,
+                temperature=0,
+            ),
+        )
+        verdict = response.text.strip().lower()
+        if verdict not in VALID_VERDICTS:
+            logger.warning("Gemini returned unexpected verdict '%s', defaulting to 'hide'", verdict)
+            return "hide"
+        return verdict
+    except Exception as e:
+        logger.error("Error calling Gemini API: %s", e)
         return "hide"
-    return verdict
 
 
 def _moderate_huggingface(text: str) -> str:

@@ -74,7 +74,7 @@ Optionally, the AI can also suggest a concise title for a new article draft.
                                           │   AI Moderator  │
                                           │  (Hugging Face  │
                                           │   Transformers  │
-                                          │   / OpenAI API) │
+                                          │  / Gemini API)  │
                                           └─────────────────┘
 ```
 
@@ -332,7 +332,7 @@ The AI moderation pipeline lives in `comment-service/app/moderation.py`.
 | `huggingface` | Uses a local Hugging Face `text-classification` model (set `HF_MODEL_NAME`) |
 | `mock` | Deterministic mock – returns `ok` for everything. Useful for tests. |
 
-### Example Moderation Prompt (OpenAI)
+### Example Moderation Prompt (Gemini)
 
 ```text
 You are a content moderator for a public blog.
@@ -384,8 +384,8 @@ POST_DATABASE_URL=postgresql://postgres:password@post-db:5432/post_db
 COMMENT_DATABASE_URL=postgresql://postgres:password@comment-db:5432/comment_db
 
 # ── AI Moderation ───────────────────────────────────────────────────
-AI_BACKEND=mock                           # openai | huggingface | mock
-OPENAI_API_KEY=sk-...                     # Required when AI_BACKEND=openai
+AI_BACKEND=mock                           # gemini | huggingface | mock
+GEMINI_API_KEY=AIzaSy...                  # Required when AI_BACKEND=gemini
 HF_MODEL_NAME=martin-ha/toxic-comment-model  # Required when AI_BACKEND=huggingface
 ```
 
