@@ -9,7 +9,7 @@ services:
     volumes:
       - auth-db-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -23,7 +23,7 @@ services:
     volumes:
       - post-db-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -37,7 +37,7 @@ services:
     volumes:
       - comment-db-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -50,6 +50,7 @@ services:
     environment:
       AUTH_DATABASE_URL: postgresql://postgres:password@auth-db:5432/auth_db
       SECRET_KEY: ${SECRET_KEY:-change-me-in-production}
+      PYTHONPATH: /app
     depends_on:
       auth-db:
         condition: service_healthy
@@ -62,6 +63,7 @@ services:
     environment:
       POST_DATABASE_URL: postgresql://postgres:password@post-db:5432/post_db
       SECRET_KEY: ${SECRET_KEY:-change-me-in-production}
+      PYTHONPATH: /app
     depends_on:
       post-db:
         condition: service_healthy
@@ -75,8 +77,9 @@ services:
       COMMENT_DATABASE_URL: postgresql://postgres:password@comment-db:5432/comment_db
       SECRET_KEY: ${SECRET_KEY:-change-me-in-production}
       AI_BACKEND: ${AI_BACKEND:-mock}
-      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       HF_MODEL_NAME: ${HF_MODEL_NAME:-martin-ha/toxic-comment-model}
+      PYTHONPATH: /app
     depends_on:
       comment-db:
         condition: service_healthy
