@@ -9,10 +9,15 @@ from app.schemas import PostCreate, PostListResponse, PostResponse, PostUpdate
 router = APIRouter(prefix="/posts", tags=["posts"])
 
 
-@router.get("", response_model=PostListResponse)
+@router.get(
+    "",
+    response_model=PostListResponse,
+    summary="List all blog posts",
+    description="Retrieves a paginated list of blog posts.",
+)
 def list_posts(
-    page: int = Query(1, ge=1),
-    size: int = Query(10, ge=1, le=100),
+    page: int = Query(1, ge=1, description="Page number"),
+    size: int = Query(10, ge=1, le=100, description="Items per page"),
     db: Session = Depends(get_db),
 ):
     posts, total = get_posts(db, page=page, size=size)
@@ -24,7 +29,16 @@ def list_posts(
     )
 
 
-@router.post("", response_model=PostResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "",
+    response_model=PostResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create a new blog post",
+    description="Creates a new blog post written by the authenticated user.",
+    responses={
+        401: {"description": "Missing or invalid authentication token"},
+    },
+)
 def create_new_post(
     post_in: PostCreate,
     db: Session = Depends(get_db),
@@ -34,7 +48,15 @@ def create_new_post(
     return post
 
 
-@router.get("/{post_id}", response_model=PostResponse)
+@router.get(
+    "/{post_id}",
+    response_model=PostResponse,
+    summary="Get post by ID",
+    description="Retrieves the details of a specific blog post by its UUID.",
+    responses={
+        404: {"description": "Post not found"},
+    },
+)
 def read_post(post_id: str, db: Session = Depends(get_db)):
     post = get_post_by_id(db, post_id)
     if post is None:
@@ -42,7 +64,17 @@ def read_post(post_id: str, db: Session = Depends(get_db)):
     return post
 
 
-@router.put("/{post_id}", response_model=PostResponse)
+@router.put(
+    "/{post_id}",
+    response_model=PostResponse,
+    summary="Update a post",
+    description="Updates the title or body of an existing post. Only the author is allowed to perform this action.",
+    responses={
+        401: {"description": "Missing or invalid authentication token"},
+        403: {"description": "Access denied: Not the post owner"},
+        404: {"description": "Post not found"},
+    },
+)
 def update_existing_post(
     post_id: str,
     post_in: PostUpdate,
@@ -57,7 +89,17 @@ def update_existing_post(
     return update_post(db, post, post_in)
 
 
-@router.delete("/{post_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{post_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete a post",
+    description="Permanently deletes a blog post. Only the author is allowed to perform this action.",
+    responses={
+        401: {"description": "Missing or invalid authentication token"},
+        403: {"description": "Access denied: Not the post owner"},
+        404: {"description": "Post not found"},
+    },
+)
 def delete_existing_post(
     post_id: str,
     db: Session = Depends(get_db),

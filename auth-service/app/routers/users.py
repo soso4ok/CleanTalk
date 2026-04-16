@@ -11,7 +11,16 @@ from app.schemas import LoginRequest, Token, UserCreate, UserResponse
 router = APIRouter()
 
 
-@router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/register",
+    response_model=UserResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Register a new user",
+    description="Creates a new user account if the username and email are unique.",
+    responses={
+        409: {"description": "Conflict: Username or Email already exists"},
+    },
+)
 def register(user_in: UserCreate, db: Session = Depends(get_db)):
     if get_user_by_username(db, user_in.username):
         raise HTTPException(
@@ -27,7 +36,15 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
     return user
 
 
-@router.post("/login", response_model=Token)
+@router.post(
+    "/login",
+    response_model=Token,
+    summary="User login",
+    description="Authenticates a user and returns a JWT access token.",
+    responses={
+        401: {"description": "Unauthorized: Invalid username or password"},
+    },
+)
 def login(body: LoginRequest, db: Session = Depends(get_db)):
     user = get_user_by_username(db, body.username)
     if user is None or not verify_password(body.password, user.hashed_password):
@@ -39,6 +56,14 @@ def login(body: LoginRequest, db: Session = Depends(get_db)):
     return Token(access_token=token)
 
 
-@router.get("/me", response_model=UserResponse)
+@router.get(
+    "/me",
+    response_model=UserResponse,
+    summary="Get current user",
+    description="Retrieves the profile of the currently authenticated user.",
+    responses={
+        401: {"description": "Missing or invalid authentication token"},
+    },
+)
 def get_me(current_user: User = Depends(get_current_user)):
     return current_user

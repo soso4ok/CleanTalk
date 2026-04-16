@@ -11,8 +11,25 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="CleanTalk Comment Service",
-    version="1.0.0",
-    description="Comment CRUD with AI moderation pipeline",
+    version="1.1.0",
+    description="""
+    Microservice for managing blog comments with an automated AI moderation pipeline.
+    
+    Features:
+    * **CRUD Operations**: List, Submit, and Remove comments.
+    * **AI Moderation**: Automatic classification (ok, hide, spam) using backend-agnostic AI handlers (Gemini, HuggingFace, or Mock).
+    * **Authorization**: JWT-based protection for sensitive operations.
+    """,
+    terms_of_service="http://example.com/terms/",
+    contact={
+        "name": "CleanTalk Support",
+        "url": "http://localhost:5173/support",
+        "email": "support@cleantalk.example.com",
+    },
+    license_info={
+        "name": "Apache 2.0",
+        "url": "https://www.apache.org/licenses/LICENSE-2.0.html",
+    },
 )
 
 app.add_middleware(
