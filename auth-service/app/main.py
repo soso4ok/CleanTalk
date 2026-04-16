@@ -11,8 +11,21 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="CleanTalk Auth Service",
-    version="1.0.0",
-    description="User registration, login, and JWT authentication",
+    version="1.1.0",
+    description="""
+    Microservice for managing user authentication and profile data.
+    
+    Features:
+    * **Identity Management**: User registration and login.
+    * **Secure Access**: JWT-based authentication for other microservices.
+    * **Profile Access**: Retrieve the current user's profile and identity.
+    """,
+    terms_of_service="http://example.com/terms/",
+    contact={
+        "name": "CleanTalk Security",
+        "url": "http://localhost:5173/security",
+        "email": "security@cleantalk.example.com",
+    },
 )
 
 app.add_middleware(

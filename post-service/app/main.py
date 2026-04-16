@@ -11,8 +11,21 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="CleanTalk Post Service",
-    version="1.0.0",
-    description="Blog post CRUD operations",
+    version="1.1.0",
+    description="""
+    Microservice for managing blog posts.
+    
+    Features:
+    * **Post Management**: Create, read, update, and delete blog posts.
+    * **Pagination**: Built-in support for paginated post listings.
+    * **Authorization**: JWT-based protection for creating, updating, and deleting posts.
+    """,
+    terms_of_service="http://example.com/terms/",
+    contact={
+        "name": "CleanTalk Social",
+        "url": "http://localhost:5173/blog",
+        "email": "blog@cleantalk.example.com",
+    },
 )
 
 app.add_middleware(
