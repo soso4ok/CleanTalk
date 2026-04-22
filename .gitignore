@@ -210,4 +210,5 @@ __marimo__/
 node_modules/
 frontend/dist/
 *.log
+raports/
 
