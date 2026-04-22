@@ -1,3 +1,4 @@
+"""
   - mock: always returns 'ok' (for testing)
   - gemini: uses Google Gemini API
   - huggingface: uses a local Hugging Face text-classification model
@@ -49,7 +50,7 @@ async def _moderate_gemini(text: str) -> str:
         return "ok"
 
     genai.configure(api_key=settings.GEMINI_API_KEY)
-    model = genai.GenerativeModel("gemini-1.5-flash")
+    model = genai.GenerativeModel("gemini-2.5-flash-lite")
 
     prompt = (
         "You are a content moderator for a public blog.\n"
@@ -66,6 +67,12 @@ async def _moderate_gemini(text: str) -> str:
                 temperature=0,
             ),
         )
+        
+        # Check if the response was blocked by safety filters
+        if response.candidates and response.candidates[0].finish_reason == 2:
+            logger.warning("Gemini blocked the response due to safety filters. Defaulting to 'hide'.")
+            return "hide"
+
         verdict = response.text.strip().lower()
         if verdict not in VALID_VERDICTS:
             logger.warning("Gemini returned unexpected verdict '%s', defaulting to 'hide'", verdict)
